@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>EL 221 Score Check</title>
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#1d2433;--muted:#667085;--line:#e4e7ec;--bg:#f6f4ef;--card:#fff;--accent:#8a1c1c;--good:#1f7a4d}
+*{box-sizing:border-box}body{margin:0;font-family:Sarabun,system-ui,sans-serif;background:var(--bg);color:var(--ink);min-height:100vh;display:flex;justify-content:center;padding:40px 16px}
+.wrap{width:100%;max-width:480px}
+header{margin-bottom:22px}.kicker{font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);font-weight:700}
+h1{font-size:30px;margin:4px 0 6px}p.sub{color:var(--muted);margin:0}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:22px}
+label{font-weight:600;font-size:14px;display:block;margin-bottom:8px}
+.row{display:flex;gap:8px}
+input{flex:1;font:inherit;font-size:18px;padding:11px 13px;border:1px solid #cfd4dc;border-radius:10px;letter-spacing:.06em}
+input:focus{outline:2px solid var(--accent);outline-offset:1px;border-color:transparent}
+button{font:inherit;font-weight:700;background:var(--accent);color:#fff;border:0;border-radius:10px;padding:0 18px;cursor:pointer}
+button:disabled{opacity:.6;cursor:wait}
+.msg{margin-top:12px;font-size:14px;color:var(--accent);min-height:20px}
+#result{margin-top:18px;display:none}
+.id{font-size:14px;color:var(--muted);margin-bottom:10px}
+table{width:100%;border-collapse:collapse}td{padding:10px 0;border-bottom:1px solid var(--line)}
+td.n{text-align:right;font-variant-numeric:tabular-nums;font-weight:600}td.n span{color:var(--muted);font-weight:400}
+.bar{height:6px;background:#eef0f3;border-radius:3px;margin-top:6px;overflow:hidden}.bar i{display:block;height:100%;background:var(--accent);opacity:.75}
+tr.total td{border-bottom:0;padding-top:14px;font-size:20px;font-weight:700}tr.total td.n{color:var(--good)}
+footer{margin-top:16px;font-size:12.5px;color:var(--muted);text-align:center}
+</style></head><body><div class="wrap">
+<header><div class="kicker">Language Institute · Thammasat University</div><h1>EL 221 Coursework Scores</h1><p class="sub">ตรวจสอบคะแนนเก็บ — enter your student ID to see your scores.</p></header>
+<div class="card">
+<form id="f"><label for="sid">Student ID / รหัสนักศึกษา</label>
+<div class="row"><input id="sid" inputmode="numeric" autocomplete="off" maxlength="10" placeholder="10 digits" required><button id="go">Check</button></div>
+<div class="msg" id="msg" role="status"></div></form>
+<div id="result"><div class="id" id="who"></div><table id="tbl"></table></div>
+</div>
+<footer>If a score looks wrong, please contact your instructor.</footer>
+</div>
+<script>
+const DATA={"salt": "KUjgTfyaC8Bl/0RD4/dNuA==", "iter": 100000, "recs": {"db57dfbcf87fe6e49e4a2ac24790b803e7e81265a1dc6655f536223bca4b0aca": "wVMoq20nR33xTVFpMrCSYDZVQ0a3JIbolGhMeYTiqcGvnd63ZGw7y825zOM2lRovlYok1OmSS40LKZkzJHQ788NnXlTzQSgGEK3EsGTLlmVIHkr/VQMmSaaTrQ==", "1c01f00102d6faafc9d6ca772153de24f2311af88fd6697fb44cab1e67729cfa": "Zfp8Dv7PUJWC/02S+OrMxb3VM7Ni4Jlk4EwB7Si5EL6WVpBseyzACfSKIpWTLL3h0MeE+Zif5L5Ad58ODwjt7Qk6EgmoJeKkle5ASXaftkmL1qq0Ll8CFzs=", "58d660981172d407dbdf6a30b489367d37394f995ca89b2b88f57c68a3461337": "m2JPWZT5F7f5f9NeeCNT1nJ0VUbrldQcRADF4Hf2l8nlJm/p83tL1i9TYH5/D67zUXvu3whcRwsbBz4ReoEjUIRWt9nVT0S/gHD0RuO8uiF9DUKge+0FF+nOxQ==", "ebd36dcf53c31a8de831f9b4bb6a92db544ab7acf56538f32dae66535bbaadf8": "u6TjHjnf3ua0ZHjvbiK4aH5ODXzWkuCdZWkzpi3QKApI9I27fMJc/Yo9o/mBobJxyxM68G9Kj0mYlYrkLytqA8g7TFfgJUzifP80dMuo7pJE7c1MgOI19xK88Bv0", "268192b9fcb2e3e676f5eeca1bb89aafb8c22287d8258e9fe90dde8070f1426b": "8topADVYL04UiOiM0OSI1H2Jy3lQWkr0obBYSTo38mebRap6f7XmaNX48kfspEEG8AmAt2qWpZWjhODEfP+Oc12bnIfx1Tzt3j2d7PNuXlYXx72Q17RTNPmXHng=", "eca4f349fd9c6691993404cf7629d17162085d38a9ea0692a6edb754d9428fde": "UuFbI9ajXkBPoG4s645IWCqQjwT9WIOE/IqBxPy4Fwa0MleHpVLWS+nl7vPohp+JVAj3clMU35Kt4JnsGoysbF/EpPrYu2bkzPd6H4U7BpP2SaiMEIhs4oI=", "88ae2b815fb4b795ba5642ccb91b6a2c7344b7f615866551231236cb9478a185": "+iUgBX+wOuJcVZ5t/2FhnJPF0cFjI6PORGf5vUpWH/gyjWA8Pu5MY+XA86CK1ofB8xb9uw/xtxVU2Jd/KE75wwXp2OAgPzeQ46B5yqF3pFOzDuM722fKIuO2aw==", "d67e351e4e025082fd6ded3da99b80d137e983927cb0377d81b54b8d9c54efd1": "iRsRa2WOv0ImHXpck0cYod9Z4G6wtFHCrTG84BaXcTiFkP0rdphvyKISzwJqwh2OkjdPyXQp2Kjup9wH9C/uglAU03KtItBhirMrW3IkyztGE5nnkl0gAzQ=", "93a64851bab8def98524c1df4762d17355018ca3e62fcfa90141c13f391cc959": "/AvKOrlDksioSrOmyo98mV+MxQfweHU8Ias6UkJCQ0oI3KNvDj8S0e95Epp7HB7DaQ5mdQHxMDTlsvdhinVS3L9J1zaMYeLeuV9L2eFenck1SuhdLsM=", "39b676fbe5e14f59d654a3a6584824defbe98776f5db2c69c1ccb30565918ae2": "pwmJrybQfP91sMDlULiZ8s9ANMGPFWHrOMjpSRUzqPn3H6M1iHPyDJqyNpnh8QYYACVhNNsMCqdl6RV04AyfR4TVL1cTql4JQCJ8lK+plwp6sgDyNVzgQsg=", "2a46b1f5b903634be3f92accc356a99bf08896252e8312810d515b8e487dc1e8": "fAtsnq7r8wOCP3xQgkWKA0X0JHcyfQP/qBf7jdSmgRFGi9w0GCeGYn8XPw37yEt7kPVmxEfXCeEe7uiDjucNt2CTFNYsNATWJuT9/ikuMbQcjLeEc4Tzr0M=", "13703e5fef878b745811042482e58d5fde4e163ef1ffe2a1d66487fd54bd4fc8": "Qh4NdeEPVvADiKHE2Jt3EmoxwmfUoO6TMXa03W/YeaJkHUCn0kFDS+QFx3s/+G4sP0nG7pbvZbHS8WqnbMauIA/VVZ6o8gg7QPPaMbID5s27q3X5Qj9B6ek=", "95a77332f0718359d96a99a05f1c4f3c20eaa410e2792cb7f2ac14940ec10d58": "5W6wDmu6gmADx1rg1v5agh1HB7clqGOxBc3AGh1rRFEogzcuqQOkh0jjPqAzGwwBiEFNHXzfwhVjSvYmcB+Th8CGdx6fBAquFbEPYS2nU6DVnmTmY24a3FS8fQ==", "e3882245b8797771ecbb245b91c7ac6050668853e39b050990c473d5fc41d39d": "KigStmesjfjMmfoD++ZpQJO6ImzciFF/wc6oNG+WhfP4Z/B3br3n8AcXu03PgRdF0TeQ6usGjM5CRo44OF9OsRTN+sNUeaCxCCIPjZPWiBh1JIX0lrePUbE=", "cbf8e2b63a3a8f0ca4e851fc4b4357f2008497880dd7d06180bba2930a006591": "Xhup/Fu+zTyTsyQCkjdevzDAdXQpiavcxCKZYzBTemR+9Ak3pllSil35h55A4ddovNlVfNyrlVT6lBFkvsS7+kHBjdRpLJoa9lstXUVI6ZyUuKDTezV645Y=", "f15b58fb64d770f7177ddb298f42b4a44f265280dd01d6af716a23909a5626b2": "RRHO5CWJwdsD1OFwKafxVreFIQgNpArG3y49aBIQ7H4cBy1BjRK+XaqwBK94LBJ6u3R3YkolrO//RFaHJsExIHzElgF02p7voqOo7VmW40kfXH8bGJEHFBsx4w==", "8fcb08afed1c9f4ac5b3f4ac51aa7fa4b67f9a891a9a1928b4391c33ffb96097": "1kqtfkcgmBHxo8W6MFtdhkbv+VcbTCweOy7oq1q3qCpoNioAjVl8bET2Wef70BCewCGN1nGVOb+QfX9wHv4V3TLiC+0iqkPgkCVDeIM07AhzcD+Pkl4P/9k=", "d4cbfb09cfaaaebc2627c5ea0f35309e2c8d0505d7ebc42e2790207acaa0559b": "pvC5eOhws/ZOa0yNGowbm0dFwbY0yishbVzOYlCBTgT2zFY8i9Kj7NP9Utvxv/x6EheqQ8YvC/VHPJvh4BqUu8rFPIUERvuho8yQJ88r8Wps1AF+7EFD", "6bb9aba15df74d187096bb2b210f43c105b3b406df94ea57e1c1120e9440208e": "0jC3hnjCKykF5eKb0OMeEpwXZiCsqgwQeKwMRagFKUP6nY6g/rZilPgIIsx8K4Om/UN3mFb/yFRoq9CltG1fW7dmGEoqKpHEE5ua98qSAfG4uA5vAo0kUS0=", "189734d6dcc56c69411ef31b785b836bcc6d175e58fb51ea74f8588ebf844b43": "xDNKHRq9J11I4iYQCa9nTPdgZr/tz9w3NZWxG5JBR64zqLagbuIY/rm9ECXDbj1sMkdqKupmVTlk0MW7uyqpNshtEmxUN0iaOduVgQyX9oxDn3KkiEldUQ==", "b2d9f8419a477118854375ef22d9bd4da06c960f26b749ddfed8dc55c400ecac": "9VCpWfM5tWUnKvfl3wsHr2BUPDI3lKyOx4aLcdLFSzJrAnVgR41X5z52KugduvcNnH7DuRfgUFx5ojNOZMtaAV+8NZJPmnnNu/h6L/K096OYJR0c8HJRQWIH", "faab619c8cc8a85e7faf5a55486f4363c2786580c1128b6e7373fcbd1505deb8": "Y/VksyYmseE/hIT0h2L+fL3tsVDihah7ZsaigQK7iJzBU08HfJ6JGYPfTEV7kA+Fa69cLcVHOjxKAt3xmtF8Vfm7TwFHYhn9zsmmrhBEoVBQN0BymKSxPQ==", "d61bb5167f93b20486e8af53fa93d16b8743684e9c986a93c0096bf749176c0b": "/bEjhRnfxAAo7ErZ8jRaDOHptXQDcZcoG9efhA9fq9VlqhSOeG6Rx2UWMFsM/c2er6RK5FDE2EXcI1GOctLBp5/daTqKn8g6aLraYz5gCFUu3PVDeb4FNCjk", "bc89fd0dabb09acacb34b158ed9ce337cb63d07bf0e579df59a2913d0b123c7d": "MzCJIAlf/nnS44DqdCJRhwEjmUamHElXFYyDACJ4P6w8ltOire0fUfKvaxBZfVRN5VrPVahbfXiOchgVmUcS93ETFReO/Bcfb+JAL8bWHXksyxQjH9k/cn8h", "36b22519f2c732d06cba840b2df7f63640b3d7cabeca65378b38b899b616608d": "dsltU4IfoBz23ue6Z3S2305Yb8sq3iJjpIhNORtAoiP/NPSZ0KUBboPBqtht3pauEupZKI3nzEsmzccCK1Nrh3sGv93+kYQgjxK+bAAVhSMvB+k7Fit9DlM=", "b86a30756abc2cb6e3b13821d38e55e6084d11ec64c7bae800f347b980cd47ef": "b/68IXEq1cJsafydWI7/SMAhnPYtUGwuV0d9jrvdE20+vkBlTC9tQmKhYo8GD2PU8agY7csdxMD+IFAGhq08Btif8/+eka6AmflgQZFwuvhxAndCpAps", "8d12dd6451c6965ba5f8f5cee88f51b26a8622a82d446c629c09c0d0b18362da": "abUC/iS1p2ogJOlWjOfVSRUKC6EZEeXqQdxfHSjq2mBAWijm8C6t9SXTTMh8fQHDk5AwsdQUE0IBZ1Qfgrs9C8ATO7A+UEEWIS89JkDePg1SPwpuwzVUJB3AEw==", "c7ec7b293ec2811892a3cd3450eac48b41dfa0d7d8f526d8eeefec5175afa58a": "JVKw08naO6DBj23YsCTKtE0NedgblCvRMdw5oFwa3caMrILyDkP9Y1QDz15uiZmfbLjnSr6qOyFvb3Gp7OmQVXoSHaJFKkmAQm0ZKmqgCoWgl56r1wNwpzmaRA==", "14a42b9bd4793268843f4f3a9b90f73bea9384340cebb788024796f09abe8786": "E22Y/hqZPU9bWXlnyK+8MprD1ru56mktIeL0+b9FxexHMku/iJW5TDmu1+tobKbe6nTRDjmt+A6JhuBYEbVrmPdeSl/mXgF6YSd1NTx3z64IoFxTu9PgHTQ=", "563f6fa9a1874171c899e3fffe312cfdff6f5d37826a9e5faa85cd7addb65687": "/8RZrkQA4Yltk0uHoLYV1uDpiu59b90npEmP2CjsnAD2myLUXk99VjHJ+IOZ42do0THjp3wgY2iN4AbWAxaYU30GFht5AnwH5zXUJXMbxW1UR8uoKtRDnfA="}};
+const ITEMS=[["A1","Assignment 1",15],["A2","Assignment 2",15],["A3","Assignment 3",15],["P","Participation",10],["A4","Assignment 4",20]];
+const b64=s=>Uint8Array.from(atob(s),c=>c.charCodeAt(0));
+const hex=a=>[...a].map(x=>x.toString(16).padStart(2,"0")).join("");
+const salt=b64(DATA.salt);
+async function lookup(id){
+  const base=await crypto.subtle.importKey("raw",new TextEncoder().encode(id),"PBKDF2",false,["deriveBits"]);
+  const bits=new Uint8Array(await crypto.subtle.deriveBits({name:"PBKDF2",salt,iterations:DATA.iter,hash:"SHA-256"},base,512));
+  const rec=DATA.recs[hex(bits.slice(32))]; if(!rec) return null;
+  const raw=b64(rec); const key=await crypto.subtle.importKey("raw",bits.slice(0,32),"AES-GCM",false,["decrypt"]);
+  const pt=await crypto.subtle.decrypt({name:"AES-GCM",iv:raw.slice(0,12)},key,raw.slice(12));
+  return JSON.parse(new TextDecoder().decode(pt));
+}
+const fmt=n=>(Math.round(n*100)/100).toString();
+document.getElementById("f").addEventListener("submit",async e=>{
+  e.preventDefault();
+  const id=document.getElementById("sid").value.replace(/\D/g,""),msg=document.getElementById("msg"),res=document.getElementById("result"),btn=document.getElementById("go");
+  res.style.display="none";msg.textContent="";
+  if(id.length!==10){msg.textContent="Please enter all 10 digits of your student ID.";return}
+  btn.disabled=true;btn.textContent="…";
+  try{
+    const s=await lookup(id);
+    if(!s){msg.textContent="No scores found for this ID. Please check the number and try again.";return}
+    let tot=0,max=0,rows="";
+    for(const[k,name,m] of ITEMS){const v=parseFloat(s[k]);tot+=v;max+=m;
+      rows+=`<tr><td>${name}<div class="bar"><i style="width:${Math.min(100,v/m*100)}%"></i></div></td><td class="n">${s[k]} <span>/ ${m}</span></td></tr>`}
+    rows+=`<tr class="total"><td>Total</td><td class="n">${fmt(tot)} <span>/ ${max}</span></td></tr>`;
+    document.getElementById("tbl").innerHTML=rows;document.getElementById("who").textContent="Student ID "+id;res.style.display="block";
+  }catch(err){msg.textContent="Something went wrong. Please try again."}
+  finally{btn.disabled=false;btn.textContent="Check"}
+});
+</script></body></html>
